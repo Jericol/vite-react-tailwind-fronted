@@ -1,76 +1,92 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import Fondo from '../public/images/bg-mobile-light.jpg';
-import CrossIcon from './component/CrossIcon';
-import MoonIcon from './component/MoonIcon';
+import Header from './component/Header';
+import TodoCreate from './component/TodoCreate';
+import TodoList from './component/TodoList';
+import TodoFilter from './component/TodoFilter';
+import TodoComputed from './component/TodoComputed';
+
+const initialStateTodos = [
+    { id: 1, title: 'ir al gym', completed: true },
+    { id: 2, title: 'ir al super', completed: true },
+    { id: 3, title: 'ir a la escuela', completed: false },
+    { id: 4, title: 'darle comida al gato', completed: false },
+    { id: 5, title: 'hacer aseo a la casa', completed: false }
+]
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [todos, setTodos] = useState(initialStateTodos);
 
-  return (
-    <div className=''>
-      <div className='min-h-screen bg-gray-300 bg-no-repeat bg-contain' style={{ backgroundImage: `url(${Fondo})` }}
-      >
-        <header className='container mx-auto px-4 pt-8'>
-          <div className='flex justify-between'>
-            <h1 className='uppercase tracking-[1rem] text-white text-2xl font-semibold'>todo</h1>
-            <button>
-               <MoonIcon className='fill-red-500 '/>
-            </button>
-          </div>
-          <form action="" className='overflow-hidden rounded-md bg-white py-4 flex items-center px-4 
-              gap-4 mt-8'
-          >
-            <span className='rounded-full border-2 w-5 h-5 inline-block '></span>
-            <input type="text" placeholder='ingresa todo' className='w-full text-gray-600 outline-none' />
-          </form>
-        </header>
+    const createTodo = (title) => {
+        const newTodo = {
+            id: Date.now(),
+            title: title.trim(),
+            completed: false,
+        }
+        setTodos([...todos, newTodo])
+    }
+
+    const removeTodo = id => {
+        setTodos(todos.filter((todo) => todo.id !== id))
+    }
+
+    const updateTodo = (id) => {
+        setTodos(todos.map(todo => (
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        )))
+    }
+
+    const computedItemsLeft = todos.filter((todo) => !todo.completed).length
+
+    const checkCompleted = () => {
+        setTodos(todos.filter((todo) => !todo.completed))
+    }
+
+    const [filter, setFilter] = useState("all");
+
+    const changeFilter = filter => setFilter(filter)
+
+    const filteredTodos = () => {
+        switch (filter) {
+            case "all":
+                return todos;
+            case "active":
+                return todos.filter((todo) => !todo.completed);
+            case "completed":
+                return todos.filter((todo) => todo.completed);
+            default: return todos
+        }
+    }
+    return (
+        <div className=''>
+            <div className='min-h-screen bg-gray-300 dark:bg-gray-900 bg-no-repeat bg-contain' 
+                style={{   backgroundImage: `url(${Fondo})` }} 
+            >
+                {/* Header */}
+                <Header />
+
+                <main className='container mx-auto px-4 mt-8'>
+                    {/* TodoCreate */}
+                    <TodoCreate createTodo={createTodo} />
+                    {/* TodoList (TodoItem) TodoUpdate & TodoDelete */}
+                    <TodoList todos={filteredTodos()} removeTodo={removeTodo} updateTodo={updateTodo} />
+                    {/* TodoComputed */}
+                    <TodoComputed computedItemsLeft={computedItemsLeft} checkCompleted={checkCompleted} />
+                    {/* TodoFilter */}
+                    <TodoFilter changeFilter={changeFilter} filter={filter}/>
+
+                </main>
 
 
-        <main className='container mx-auto px-4 mt-8'>
-          <div className='rounded-md bg-white [&>article]:p-4'>
-            <article className='flex gap-4 border-b border-black'>
-              <button className='flex-none rounded-full border-2 w-5 h-5 inline-block'></button>
-              <p className='text-sm grow text-gray-600'>Complete online Javascript</p>
-              <button className='flex-none'>
-                 <CrossIcon />
-              </button>
-            </article>
-            <article className='flex gap-4 border-b border-black'>
-              <button className='flex-none rounded-full border-2 w-5 h-5 inline-block'></button>
-              <p className='text-sm grow text-gray-600'>Complete online Javascript</p>
-              <button className='flex-none'>
-                 <CrossIcon />
-              </button>
-            </article>
-            <article className='flex gap-4 border-b border-black'>
-              <button className='flex-none rounded-full border-2 w-5 h-5 inline-block'></button>
-              <p className='text-sm grow text-gray-600'>Complete online Javascript</p>
-              <button className='flex-none'>
-                 <CrossIcon />
-              </button>
-            </article>
-            <section className='flex justify-between px-4 py-4 text-gray-400'>
-              <span>5 items left</span>
-              <button>Clear completed</button>
-            </section>
-          </div>
-        </main>
-
-        <section className='container mx-auto px-4 mt-8'>
-          <div className='flex justify-center gap-4 bg-white px-4 py-4 rounded-md'>
-            <button className='hover:text-blue-400 cursor-pointer'>all</button>
-            <button className='hover:text-blue-400 cursor-pointer'>Active</button>
-            <button className='hover:text-blue-400 cursor-pointer'>Completed</button>
-          </div>
-        </section>
-
-        <section className='container mx-auto mt-8 px-4 text-center'>Drag or drop order list</section>
-      </div>
-    </div>
-  )
+                <section className='container mx-auto mt-8 px-4 text-center dark:text-gray-400'>
+                    Drag or drop order list
+                </section>
+            </div>
+        </div>
+    )
 }
+
+
 
 export default App
