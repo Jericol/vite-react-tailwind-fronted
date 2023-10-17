@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import Fondo from '../public/images/bg-mobile-light.jpg';
 import Header from './component/Header';
@@ -7,16 +7,14 @@ import TodoList from './component/TodoList';
 import TodoFilter from './component/TodoFilter';
 import TodoComputed from './component/TodoComputed';
 
-const initialStateTodos = [
-    { id: 1, title: 'ir al gym', completed: true },
-    { id: 2, title: 'ir al super', completed: true },
-    { id: 3, title: 'ir a la escuela', completed: false },
-    { id: 4, title: 'darle comida al gato', completed: false },
-    { id: 5, title: 'hacer aseo a la casa', completed: false }
-]
+const initialStateTodos = JSON.parse(localStorage.getItem("todos")) || []
 
 function App() {
     const [todos, setTodos] = useState(initialStateTodos);
+
+    useEffect(() => {
+        localStorage.setItem("todos", JSON.stringify(todos))
+    }, [todos])
 
     const createTodo = (title) => {
         const newTodo = {
